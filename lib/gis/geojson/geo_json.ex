@@ -2,6 +2,8 @@ defmodule Exa.Gis.GeoJson.GeoJson do
   @moduledoc """
   An interface for GeoJSON utilities.
   """
+  require Logger
+  
   import Exa.Types
   alias Exa.Types, as: E
 
@@ -35,7 +37,7 @@ defmodule Exa.Gis.GeoJson.GeoJson do
   def geo_factory(kw) when is_keyword(kw) do
     case Keyword.get(kw, :type, :error) do
       :error ->
-        Map.new(kw)
+        {:map, Map.new(kw)}
 
       "Point" ->
         %GJ.GeoPoint{
@@ -94,7 +96,9 @@ defmodule Exa.Gis.GeoJson.GeoJson do
         }
 
       type ->
-        Map.new(kw) |> IO.inspect("Warning: unrecognized type '#{inspect(type)}'")
+        msg = "Unrecognized GeoJSON type '#{inspect(type)}'"
+        Logger.warning(msg)
+        {:map, Map.new(kw)} 
     end
   end
 

@@ -3,6 +3,7 @@ defmodule Exa.Gis.GeoJson.Types do
   Types for GeoJSON format.
 
   All coordinates are in decimal degrees.
+  Locations are lon/lat order, to match Cartesian (x,y).
 
   Note that GIS types use tagged tuples,
   but GeoJSON uses structs. 
@@ -12,7 +13,7 @@ defmodule Exa.Gis.GeoJson.Types do
   standalone set of types with clear semantics.
   """
 
-  alias Exa.Gfx.Types, as: G
+  alias Exa.Space.Types, as: S
 
   # -------------------
   # GEO JSON primitives
@@ -29,12 +30,14 @@ defmodule Exa.Gis.GeoJson.Types do
   # point
 
   defmodule GeoPoint do
+    alias Exa.Gis.GeoJson.Types, as: GJ
+
     @enforce_keys [:coordinates]
     defstruct [:coordinates, :bbox, type: "Point"]
 
     @type t() :: %__MODULE__{
             type: String.t(),
-            bbox: G.bbox2f(),
+            bbox: S.bbox2f(),
             coordinates: GJ.coord()
           }
   end
@@ -46,12 +49,14 @@ defmodule Exa.Gis.GeoJson.Types do
   # line string 
 
   defmodule GeoLineString do
+    alias Exa.Gis.GeoJson.Types, as: GJ
+
     @enforce_keys [:coordinates]
     defstruct [:coordinates, :bbox, type: "LineString"]
 
     @type t() :: %__MODULE__{
             type: String.t(),
-            bbox: G.bbox2f(),
+            bbox: S.bbox2f(),
             coordinates: GJ.coords()
           }
   end
@@ -63,12 +68,14 @@ defmodule Exa.Gis.GeoJson.Types do
   # polygon
 
   defmodule GeoPolygon do
+    alias Exa.Gis.GeoJson.Types, as: GJ
+
     @enforce_keys [:coordinates]
     defstruct [:coordinates, :bbox, type: "Polygon"]
 
     @type t() :: %__MODULE__{
             type: String.t(),
-            bbox: G.bbox2f(),
+            bbox: S.bbox2f(),
             coordinates: GJ.coordss()
           }
   end
@@ -81,12 +88,14 @@ defmodule Exa.Gis.GeoJson.Types do
   # multi point 
 
   defmodule GeoMultiPoint do
+    alias Exa.Gis.GeoJson.Types, as: GJ
+
     @enforce_keys [:coordinates]
     defstruct [:coordinates, :bbox, type: "MultiPoint"]
 
     @type t() :: %__MODULE__{
             type: String.t(),
-            bbox: G.bbox2f(),
+            bbox: S.bbox2f(),
             coordinates: GJ.coords()
           }
   end
@@ -99,12 +108,14 @@ defmodule Exa.Gis.GeoJson.Types do
   # multi line string
 
   defmodule GeoMultiLineString do
+    alias Exa.Gis.GeoJson.Types, as: GJ
+
     @enforce_keys [:coordinates]
     defstruct [:coordinates, :bbox, type: "MultiLineString"]
 
     @type t() :: %__MODULE__{
             type: String.t(),
-            bbox: G.bbox2f(),
+            bbox: S.bbox2f(),
             coordinates: GJ.coordss()
           }
   end
@@ -117,12 +128,14 @@ defmodule Exa.Gis.GeoJson.Types do
   # multi polygon
 
   defmodule GeoMultiPolygon do
+    alias Exa.Gis.GeoJson.Types, as: GJ
+
     @enforce_keys [:coordinates]
     defstruct [:coordinates, :bbox, type: "MultiPolygon"]
 
     @type t() :: %__MODULE__{
             type: String.t(),
-            bbox: G.bbox2f(),
+            bbox: S.bbox2f(),
             coordinates: GJ.coordsss()
           }
   end
@@ -145,12 +158,14 @@ defmodule Exa.Gis.GeoJson.Types do
   # geometry collection 
 
   defmodule GeoGeometryCollection do
+    alias Exa.Gis.GeoJson.Types, as: GJ
+
     @enforce_keys [:geometries]
     defstruct [:geometries, :bbox, type: "GeometryCollection"]
 
     @type t() :: %__MODULE__{
             type: String.t(),
-            bbox: G.bbox2f(),
+            bbox: S.bbox2f(),
             geometries: [GJ.geometry()]
           }
   end
@@ -164,12 +179,14 @@ defmodule Exa.Gis.GeoJson.Types do
   # feature 
 
   defmodule GeoFeature do
+    alias Exa.Gis.GeoJson.Types, as: GJ
+
     @enforce_keys [:geometry]
     defstruct [:geometry, :bbox, properties: [], type: "Feature"]
 
     @type t() :: %__MODULE__{
             type: String.t(),
-            bbox: G.bbox2f(),
+            bbox: S.bbox2f(),
             properties: map(),
             geometry: GJ.geometry()
           }
@@ -182,12 +199,14 @@ defmodule Exa.Gis.GeoJson.Types do
   # feature collection
 
   defmodule GeoFeatureCollection do
+        alias Exa.Gis.GeoJson.Types, as: GJ
+
     @enforce_keys [:features]
     defstruct [:features, :bbox, properties: [], type: "FeatureCollection"]
 
     @type t() :: %__MODULE__{
             type: String.t(),
-            bbox: G.bbox2f(),
+            bbox: S.bbox2f(),
             properties: map(),
             features: [GJ.geofeature()]
           }

@@ -35,15 +35,13 @@ defmodule Exa.Gis.CsvTest do
     assert @default == csv
 
     # default parser
-    {:csv, :list, csv} = CsvReader.from_file(file, pardef: Location.guess())
-    IO.inspect(csv, label: "guess")
+    {:csv, :list, csv} = CsvReader.from_file(file, pardef: Location.p_guess())
     assert @parsed == csv
 
     # specific parser
-    latlonpar = Parse.compose([Parse.null(@nulls), &Location.parse/1])
+    latlonpar = Parse.compose([Parse.p_null(@nulls), &Location.parse/1])
     parsers = %{2 => latlonpar, 3 => latlonpar}
-    {:csv, keys, csv} = CsvReader.from_file(file, parsers: parsers)
-
+    {:csv, _keys, csv} = CsvReader.from_file(file, parsers: parsers)
     assert @parsed == csv
   end
 end

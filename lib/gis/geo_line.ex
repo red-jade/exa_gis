@@ -8,6 +8,7 @@ defmodule Exa.Gis.GeoLine do
   use Exa.Gis.Constants
 
   import Exa.Types
+  alias Exa.Types, as: E
 
   import Exa.Gis.Types
   alias Exa.Gis.Types, as: G

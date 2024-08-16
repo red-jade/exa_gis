@@ -47,6 +47,7 @@ defmodule Exa.Gis.Location do
   use Exa.Constants
 
   import Exa.Types
+  alias Exa.Types, as: E
 
   import Exa.Gis.Types
   alias Exa.Gis.Types, as: G
@@ -305,7 +306,7 @@ defmodule Exa.Gis.Location do
   # -----------
 
   @doc "Convert any location to decimal degree (DD) signed format."
-  @spec to_dd(G.location()) :: G.location_dd()
+  @spec to_dd(G.location()) :: G.location_dd() | {:error, any()}
 
   def to_dd({{ad, am, as, ns} = lat, {od, om, os, ew} = lon}) 
       when is_loc_dms(ad, am, as, ns, od, om, os, ew),
@@ -323,10 +324,10 @@ defmodule Exa.Gis.Location do
       when is_loc_dd(ad, od), 
     do: loc
 
-  def to_dd(loc), do: raise(ArgumentError, message: "Unrecognized location format '#{loc}'")
+  def to_dd(loc), do: {:error, "Unrecognized location format '#{loc}'"}
 
   @doc "Convert any location to decimal degree (D) directional format."
-  @spec to_d(G.location()) :: G.location_d()
+  @spec to_d(G.location()) :: G.location_d() | {:error, any()}
 
   def to_d({{ad, am, as, ns} = lat, {od, om, os, ew} = lon}) 
       when is_loc_dms(ad, am, as, ns, od, om, os, ew),
@@ -344,10 +345,10 @@ defmodule Exa.Gis.Location do
       when is_loc_dd(ad, od), 
     do: {ad |> latns(), od |> lonew()}
 
-  def to_d(loc), do: raise(ArgumentError, message: "Unrecognized location format '#{loc}'")
+  def to_d(loc), do: {:error, "Unrecognized location format '#{loc}'"}
 
   @doc "Convert any location to degree and decimal minute (DM) directional format."
-  @spec to_dm(G.location()) :: G.location_dm()
+  @spec to_dm(G.location()) :: G.location_dm() | {:error, any()}
 
   def to_dm({{ad, am, as, ns}=lat, {od, om, os, ew}=lon}) 
       when is_loc_dms(ad, am, as, ns, od, om, os, ew),
@@ -365,10 +366,10 @@ defmodule Exa.Gis.Location do
       when is_loc_dd(ad, od), 
     do: {ad |> latns() |> dm(), od |> lonew() |> dm()}
 
-  def to_dm(loc), do: raise(ArgumentError, message: "Unrecognized location format '#{loc}'")
+  def to_dm(loc), do: {:error, "Unrecognized location format '#{loc}'"}
 
   @doc "Convert any location to degree, minute and decimal second (DMS) directional format."
-  @spec to_dms(G.location()) :: G.location_dms()
+  @spec to_dms(G.location()) :: G.location_dms() | {:error, any()}
 
   def to_dms({{ad, am, as, ns}, {od, om, os, ew}}=loc) 
       when is_loc_dms(ad, am, as, ns, od, om, os, ew), 
@@ -386,7 +387,7 @@ defmodule Exa.Gis.Location do
       when is_loc_dd(ad, od), 
     do: {ad |> latns() |> dms(), od |> lonew() |> dms()}
 
-  def to_dms(loc), do: raise(ArgumentError, message: "Unrecognized location format '#{loc}'")
+  def to_dms(loc), do: {:error, "Unrecognized location format '#{loc}'"}
 
   # private conversion utilities 
   # neutral between lat/lon, always copy through the nsew
@@ -420,7 +421,7 @@ defmodule Exa.Gis.Location do
     default is ASCII `{"°", "'", "\""}}`,
     but Unicode values are also available 
   """
-  @spec format(G.location(), G.prec_dms(), G.sep_nsew(), G.sep_dms()) :: String.t()
+  @spec format(G.location(), G.prec_dms(), G.sep_nsew(), G.sep_dms()) :: String.t() | {:error, any()}
   def format(loc, prec \\ @prec_dms, sep_nsew \\ :nsew, sep_dms \\ @sym_ascii)
 
   # format dms
@@ -516,7 +517,7 @@ defmodule Exa.Gis.Location do
   end
 
   def format(loc, _, _, _) do
-    raise ArgumentError, message: "Unrecognized location format '#{loc}'"
+    {:error, "Unrecognized location format '#{loc}'"}
   end
 
   # format utils
@@ -587,9 +588,9 @@ defmodule Exa.Gis.Location do
   Note hex integers are not included, 
   because there is ambiguity with base-10 integers.
   """
-  @spec guess([String.t()], [String.t()], [String.t()], Calendar.calendar()) :: P.parfun(any())
-  def guess(nulls \\ @nulls, trues \\ @trues, falses \\ @falses, cal \\ Calendar.ISO) do
-    Parse.compose([Parse.guess(nulls, trues, falses, cal), &parse/1])
+  @spec p_guess([String.t()], [String.t()], [String.t()], Calendar.calendar()) :: P.parfun(any())
+  def p_guess(nulls \\ @nulls, trues \\ @trues, falses \\ @falses, cal \\ Calendar.ISO) do
+    Parse.compose([Parse.p_guess(nulls, trues, falses, cal), &parse/1])
   end
 
   # -----
@@ -598,9 +599,6 @@ defmodule Exa.Gis.Location do
 
   @typep token() :: integer() | float() | G.nsew() | :deg | :min | :sec | :com
   @typep tokens() :: [token()]
-
-  # TODO - remove on next revision of Exa Core
-  defguardp is_err(err) when is_tag_tuple(err, 2, :error)
 
   @doc """
   Parse a geo-location.
@@ -631,7 +629,7 @@ defmodule Exa.Gis.Location do
     end
   end
 
-  @spec do_parse(String.t()) :: G.location() | {:error, String.t()}
+  @spec do_parse(String.t()) :: G.location() | {:error, any()}
   defp do_parse(str) when is_string(str) do
     with toks             when not is_err(toks) <- lex(str,[]),
          {toks, lat}=part when not is_err(part) <- lat(toks),
@@ -640,7 +638,8 @@ defmodule Exa.Gis.Location do
     end
   end
 
-  @spec lat(tokens()) :: {tokens(), G.latitude()} | {:error, String.t()}
+  @spec lat(tokens()) :: {tokens(), G.latitude()} | {:error, any()}
+  
   defp lat([ f,                        :com|ts]) when is_lat_dec_deg(f),    do: {ts, f} 
   defp lat([ f,:deg,                   :com|ts]) when is_lat_dec_deg(f),    do: {ts, f}
   defp lat([ f,     ns,                :com|ts]) when is_lat_d(f,ns),       do: {ts, {f,ns}}
@@ -653,10 +652,15 @@ defmodule Exa.Gis.Location do
   defp lat([di,:deg,mi,:min,sf,:sec,   :com|ts]) when is_lat_dms(di,mi,sf), do: {ts, latns(di,mi,sf)}
   defp lat([di,     mi,     sf,     ns,:com|ts]) when is_lat_dms(di,mi,sf,ns), do: {ts, {di,mi,sf,ns}}
   defp lat([di,:deg,mi,:min,sf,:sec,ns,:com|ts]) when is_lat_dms(di,mi,sf,ns), do: {ts, {di,mi,sf,ns}}
-  defp lat([{:error, _}=err|_]), do: err
-  defp lat(toks), do: {:error, "Illegal latitude tokens '#{inspect(toks)}'"}
+  
+  defp lat(toks) do
+    msg = "Illegal latitude tokens '#{inspect(toks)}'"
+    Logger.warning(msg)
+    {:error, msg}
+  end
 
-  @spec lon(tokens()) :: G.longitude() | {:error, String.t()}
+  @spec lon(tokens()) :: G.longitude() | {:error, any()}
+  
   defp lon([ f        ]                ) when is_lon_dec_deg(f),       do: f 
   defp lon([ f,:deg   ]                ) when is_lon_dec_deg(f),       do: f 
   defp lon([ f,     ew]                ) when is_lon_d(f,ew),          do: {f,ew}
@@ -669,10 +673,14 @@ defmodule Exa.Gis.Location do
   defp lon([di,:deg,mi,:min,sf,:sec   ]) when is_lon_dms(di,mi,sf),    do: lonew(di,mi,sf)
   defp lon([di,     mi,     sf,     ew]) when is_lon_dms(di,mi,sf,ew), do: {di,mi,sf,ew}
   defp lon([di,:deg,mi,:min,sf,:sec,ew]) when is_lon_dms(di,mi,sf,ew), do: {di,mi,sf,ew}
-  defp lon({:error, _}=err), do: err
-  defp lon(toks), do: {:error, "Illegal longitude tokens '#{inspect(toks)}'"}
 
-  @spec latns(G.dec_deg()) :: G.lat_d()
+  defp lon(toks) do
+    msg = "Illegal longitude tokens '#{inspect(toks)}'"
+    Logger.warning(msg)
+    {:error, msg}
+  end
+
+  @spec latns(G.lat_dec_deg()) :: G.lat_d()
   defp latns(f) when f >= 0.0, do: {f,:N}
   defp latns(f), do: {-f,:S}
 
@@ -684,11 +692,11 @@ defmodule Exa.Gis.Location do
   defp latns(di,mi,sf) when di >= 0, do: {di,mi,sf,:N}
   defp latns(di,mi,sf), do: {-di,mi,sf,:S}
 
-  @spec lonew(G.dec_deg()) :: G.lon_d()
+  @spec lonew(G.lat_dec_deg()) :: G.lon_d()
   defp lonew(f) when f >= 0.0, do: {f,:E}
   defp lonew(f), do: {-f,:W}
 
-  @spec lonew({G.lon_nat_deg(),G.pos_min()}) :: G.lon_dm()
+  @spec lonew(G.lon_nat_deg(),G.pos_min()) :: G.lon_dm()
   defp lonew(di,mf) when di >= 0, do: {di,mf,:E}
   defp lonew(di,mf), do: {-di,mf,:W}
 
@@ -704,7 +712,8 @@ defmodule Exa.Gis.Location do
   # accept fancy single quote for minutes
   # accept fancy '99' double quote for seconds 
 
-  @spec lex(String.t(), tokens()) :: tokens() | {:error, String.t()}
+  @spec lex(String.t(), tokens()) :: tokens() | {:error, any()}
+  
   defp lex(<<c,   b::binary>>, ts) when is_ws(c),           do: lex(b, ts)
   defp lex(<<c, _::binary>>=b, ts) when is_numstart(c),     do: num(b, <<>>, false, ts)
   defp lex(<<c::utf8, b::binary>>, ts) when c in @deg_syms, do: lex(b, [:deg|ts])
@@ -717,9 +726,12 @@ defmodule Exa.Gis.Location do
   defp lex(<<?E,      b::binary>>, ts),                     do: lex(b, [:E|ts])
   defp lex(<<?W,      b::binary>>, ts),                     do: lex(b, [:W|ts])
   defp lex(<<?,,      b::binary>>, ts),                     do: lex(b, [:com|ts])
-  defp lex(<<>>,                      ts),                  do: Enum.reverse(ts)
+  defp lex(<<>>,                   ts),                     do: Enum.reverse(ts)
+  
   defp lex(<<c::utf8,    _::binary>>, _ ) do
-    {:error, "Illegal char \\u#{Exa.String.int_hex(c)} '#{<<c::utf8>>}'"}
+    msg = "Illegal char \\u#{Exa.String.int_hex(c)} '#{<<c::utf8>>}'"
+    Logger.warning(msg)
+    {:error, msg}
   end
 
   @spec num(String.t(), String.t(), bool(), tokens()) :: tokens()
