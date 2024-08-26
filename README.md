@@ -24,7 +24,12 @@ Basic Haversine (spherical geometry) for distances and geodesics.
 
 At least one projection: _Equirectangular Projection_
 
-### License
+## Building
+
+To bootstrap an `exa_xxx` library build, 
+you must run `mix deps.get` twice.
+
+### EXA License
 
 EXA source code is released under the MIT license.
 
