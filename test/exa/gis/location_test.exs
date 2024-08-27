@@ -202,17 +202,17 @@ defmodule Exa.Gis.LocationTest do
 
   test "add" do
     origin = {0.0, 0.0}
-    assert {10.0, 20.0} = add(origin, 10.0, 20.0)
-    assert {-10.0, -20.0} = add(origin, -10.0, -20.0)
+    assert {10.0, 20.0} == add(origin, 10.0, 20.0)
+    assert {-10.0, -20.0} == add(origin, -10.0, -20.0)
 
     # wrap longitude
-    assert {10.0, -160.0} = add(origin, 10.0, 200.0)
-    assert {10.0, 0.0} = add(origin, 10.0, 360.0)
+    assert {10.0, -160.0} == add(origin, 10.0, 200.0)
+    assert {10.0, 0.0} == add(origin, 10.0, 360.0)
 
     # flip longitude
-    assert {80.0, -160.0} = add(origin, 100.0, 20.0)
+    assert {80.0, -160.0} == add(origin, 100.0, 20.0)
     assert equals?({-20.0, -160.0}, add(origin, 200.0, 20.0))
-    assert {-80.0, 20.0} = add(origin, 280.0, 20.0)
+    assert {-80.0, 20.0} == add(origin, 280.0, 20.0)
   end
 
   test "initial bearing" do

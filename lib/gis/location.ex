@@ -64,13 +64,6 @@ defmodule Exa.Gis.Location do
   # note excluded in .formatter.exs
   # ===============================
 
-  # TODO - remove when roll Exa Core version
-
-      # default fields for parsing null and boolean values
-      @nulls ["", "nil", "null", "nan", "inf"]
-      @falses ["false", "f"]
-      @trues ["true", "t"]
-
   # ----------
   # comparison
   # ----------
@@ -85,10 +78,17 @@ defmodule Exa.Gis.Location do
   """
   @spec equals?(G.location(), G.location()) :: bool()
 
-  def equals?({{ 90, 0, 0.0, _}, {od1, om1, os1, ew1}}, {{ 90, 0, 0.0, _}, {od2, om2, os2, ew2}}) when 
-      is_lon_dms(od1, om1, os1, ew1) and is_lon_dms(od2, om2, os2, ew2), do: true
-  def equals?({{-90, 0, 0.0, _}, {od1, om1, os1, ew1}}, {{-90, 0, 0.0, _}, {od2, om2, os2, ew2}}) when 
-      is_lon_dms(od1, om1, os1, ew1) and is_lon_dms(od2, om2, os2, ew2), do: true
+  def equals?({{ 90, 0, zero, _}, {od1, om1, os1, ew1}}, {{ 90, 0, zero, _}, {od2, om2, os2, ew2}}) when 
+      zero == 0.0 and 
+      is_lon_dms(od1, om1, os1, ew1) and 
+      is_lon_dms(od2, om2, os2, ew2), 
+      do: true
+
+  def equals?({{-90, 0, zero, _}, {od1, om1, os1, ew1}}, {{-90, 0, zero, _}, {od2, om2, os2, ew2}}) when 
+      zero == 0.0 and 
+      is_lon_dms(od1, om1, os1, ew1) and 
+      is_lon_dms(od2, om2, os2, ew2), 
+      do: true
 
   def equals?(
     {{ad1, am1, as1, ns1}, {od1, om1, os1, ew1}},
@@ -99,10 +99,17 @@ defmodule Exa.Gis.Location do
     ew1 == ew2 and od1 == od2 and om1 == om2 and Math.equals?(os1, os2) 
   end
 
-  def equals?({{ 90, 0.0, _}, {od1, om1, ew1}}, {{ 90, 0.0, _}, {od2, om2, ew2}}) when 
-      is_lon_dm(od1, om1, ew1) and is_lon_dm(od2, om2, ew2), do: true
-  def equals?({{-90, 0.0, _}, {od1, om1, ew1}}, {{-90, 0.0, _}, {od2, om2, ew2}}) when 
-      is_lon_dm(od1, om1, ew1) and is_lon_dm(od2, om2, ew2), do: true
+  def equals?({{ 90, zero, _}, {od1, om1, ew1}}, {{ 90, zero, _}, {od2, om2, ew2}}) when 
+      zero == 0.0 and
+      is_lon_dm(od1, om1, ew1) and 
+      is_lon_dm(od2, om2, ew2), 
+      do: true
+
+  def equals?({{-90, zero, _}, {od1, om1, ew1}}, {{-90, zero, _}, {od2, om2, ew2}}) when 
+      zero == 0.0 and
+      is_lon_dm(od1, om1, ew1) and 
+      is_lon_dm(od2, om2, ew2), 
+      do: true
 
   def equals?(
     {{ad1, am1, ns1}, {od1, om1, ew1}}, 
@@ -213,7 +220,7 @@ defmodule Exa.Gis.Location do
   """
   @spec add(G.location(), float(), float()) :: G.location_dd()
 
-  def add(loc, 0.0, delta_lon) when is_float(delta_lon) do
+  def add(loc, zero, delta_lon) when zero == 0.0 and is_float(delta_lon) do
     {lat, init_lon} = to_dd(loc)
     lon = 180.0 * Math.frac_sign((init_lon + delta_lon) / 180.0)
     to_dd({lat, lon})
