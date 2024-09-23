@@ -210,8 +210,8 @@ defmodule Exa.Gis.Types do
   # shortest great cicle path between two points
 
   @type geoline() :: {:geoline, location_dd(), location_dd()}
-  defguard is_geoline(g) when is_tag_tuple(g, 3, :geoline)
+  defguard is_geoline(g) when is_tuple_tag(g, 3, :geoline)
 
   @type geodesic() :: {:geodesic, [location_dd()]}
-  defguard is_geodesic(g) when is_tag_tuple(g, 2, :geodesic)
+  defguard is_geodesic(g) when is_tuple_tag(g, 2, :geodesic)
 end
