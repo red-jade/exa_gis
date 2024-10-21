@@ -3,7 +3,7 @@ defmodule Exa.Gis.MixProject do
 
   @lib  :exa_gis
   @name "Exa Gis"
-  @ver  "0.2.4"
+  @ver  "0.3.0"
 
   # umbrella project
   @exa {:exa,
