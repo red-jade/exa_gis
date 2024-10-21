@@ -222,6 +222,7 @@ defmodule Exa.Gis.LocationTest do
     assert 60.0 < heading and heading < 61.0
   end
 
+  @tag timeout: 20_000
   test "google maps" do
     if Http.internet?() do
       :ok
