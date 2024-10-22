@@ -80,6 +80,7 @@ defmodule Exa.Gis.MixProject do
        branch: "main",
        only: [:dev, :test],
        runtime: false,
+       compile: "ls",
        app: false}
     ]
   end
