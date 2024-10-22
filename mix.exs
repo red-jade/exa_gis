@@ -77,7 +77,7 @@ defmodule Exa.Gis.MixProject do
       # GeoJSON files for testing (no code)
       {:geo_countries,
        git: "https://github.com/datasets/geo-countries.git",
-       branch: "master",
+       branch: "main",
        only: [:dev, :test],
        runtime: false,
        app: false}
