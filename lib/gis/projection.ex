@@ -52,7 +52,7 @@ defmodule Exa.Gis.Projection do
   The extent should not cross the poles or the date-line meridian.
   """
   @spec new_equirect(loc :: G.location(), w2 :: G.metres(), h2 :: G.metres()) :: any()
-  def new_equirect(loc, w2, h2) when is_pos_float(w2) and is_pos_float(h2) do
+  def new_equirect(loc, w2, h2) when is_float_pos(w2) and is_float_pos(h2) do
     {plat, _} = dd = Location.to_dd(loc)
     mlat = @lat1_eqtr + @delta_pole * abs(plat) / 90.0
     mlon = @lon1_eqtr * Math.cosd(plat)

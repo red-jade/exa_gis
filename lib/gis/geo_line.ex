@@ -79,7 +79,7 @@ defmodule Exa.Gis.GeoLine do
   each one less than the maximum step size.
   """
   @spec interp_step(G.geoline(), G.metres()) :: G.geodesic()
-  def interp_step({:geoline, loc1, loc2}, step) when is_pos_float(step) do
+  def interp_step({:geoline, loc1, loc2}, step) when is_float_pos(step) do
     dist = Location.distance(loc1, loc2)
 
     case trunc(ceil(dist / step)) do

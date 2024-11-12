@@ -165,7 +165,7 @@ defmodule Exa.Gis.Location do
   def travel(loc, cp, m) when is_compass(cp) do
     travel(loc, Bearing.bearing(cp), m)
   end
-  def travel(loc, deg, m) when is_pos_float(m) do
+  def travel(loc, deg, m) when is_float_pos(m) do
     {lat1, lon1} = to_dd(loc)
     sinlat1 = Math.sind(lat1)
     coslat1 = Math.cosd(lon1)
