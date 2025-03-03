@@ -29,7 +29,7 @@ defmodule Exa.Gis.MixProject do
   defp extra(:prod), do: [:logger]
   defp extra(_), do: [:logger, :inets, :ssl]
 
-  def docs do
+  defp docs do
     [
       main: "readme",
       output: "doc/api",
